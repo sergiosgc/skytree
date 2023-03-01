@@ -7,7 +7,7 @@ use clap::{Parser, command};
 #[command(name = "skytree")]
 #[command(author = "Sérgio Carvalho")]
 #[command(version = "1.0")]
-#[command(about = "Web and REST API managament of Ansible Inventory", long_about = None)]
+#[command(about = "Web and REST API management of Ansible Inventory", long_about = None)]
 struct CliArguments {
     #[arg(short='c', long="config-file")]
     config_file: Option<String>,
