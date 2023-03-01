@@ -1,0 +1,14 @@
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE host_group(id INTEGER PRIMARY KEY, parent INTEGER REFERENCES host_groups(id), name TEXT);
+CREATE TABLE host(id INTEGER PRIMARY KEY, name TEXT);
+CREATE TABLE variable(id INTEGER PRIMARY KEY, name TEXT);
+CREATE TABLE service(id INTEGER PRIMARY KEY, name TEXT, parent references service(id));
+CREATE TABLE host_variable(variable INTEGER NOT NULL REFERENCES variable(id), host INTEGER NOT NULL REFERENCES host(id), value TEXT NOT NULL, PRIMARY KEY (variable, host));
+CREATE TABLE service_variable(variable INTEGER NOT NULL REFERENCES variable(id), "service" INTEGER NOT NULL REFERENCES "service"(id), value TEXT NOT NULL, PRIMARY KEY (variable, "service"));
+CREATE TABLE service_instance(id INTEGER PRIMARY KEY, "service" INTEGER NOT NULL REFERENCES "service"(id), host INTEGER NOT NULL REFERENCES host(id), ip TEXT NOT NULL, name TEXT NOT NULL, unique(service, host, name));
+CREATE TABLE service_instance_variable(variable INTEGER NOT NULL REFERENCES variable(id), instance INTEGER NOT NULL REFERENCES service_instance(id), value TEXT NOT NULL, primary key (variable, instance));
+CREATE TABLE host_group_variable(variable INTEGER NOT NULL REFERENCES variable(id), "group" INTEGER NOT NULL REFERENCES "group"(id), value TEXT NOT NULL, PRIMARY KEY (variable, "group"));
+CREATE TABLE host_group_membership(host integer references host(id), "group" integer references host_group(id), primary key (host, "group"));
+CREATE TABLE db_version(key text primary key check (key = 'single-row'), version integer);
+COMMIT;

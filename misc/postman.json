@@ -1,0 +1,38 @@
+{
+	"info": {
+		"_postman_id": "0f24486d-18c3-4ca8-83b5-79b3fee251e7",
+		"name": "SkyTree",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17102554"
+	},
+	"item": [
+		{
+			"name": "Get Host Groups",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/host_groups",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"host_groups"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
