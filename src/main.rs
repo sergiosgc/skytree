@@ -1,7 +1,7 @@
 use actix_web::{web, App, HttpServer};
 use handlebars::Handlebars;
-use skytree::{skytree::{host_group::{HostGroup, self, NewHostGroup}, rest::{RestCollection, Rest}}, AppData, Config};
 use clap::{Parser, command};
+use skytree::{Config, AppData, skytree::host_group::{HostGroup, NewHostGroup, self}, rest::{RestCollection, Rest}};
 
 #[derive(Parser, Debug)]
 #[command(name = "skytree")]

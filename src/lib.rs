@@ -2,6 +2,7 @@ use handlebars::Handlebars;
 pub mod schema;
 pub mod skytree;
 pub mod negotiated;
+pub mod rest;
 #[derive(Debug, Default, Clone)]
 pub struct AppData<'a> {
     pub handlebars: Handlebars<'a>,

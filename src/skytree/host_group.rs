@@ -1,9 +1,8 @@
 use std::env;
 
 use async_trait::async_trait;
-use crate::negotiated::Responder;
+use crate::{negotiated::Responder, rest::{RestCollection, Rest}};
 use serde::{Deserialize, Serialize};
-use super::rest::{RestCollection, Rest};
 use diesel::{self, *};
 use crate::schema;
 
