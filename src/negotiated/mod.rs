@@ -1,4 +1,4 @@
-use actix_web::{HttpRequest, HttpResponse, http::header::{ContentType, self}, body::BoxBody};
+use actix_web::{HttpRequest, HttpResponse, http::header::{ContentType, self}, body::BoxBody, error::BlockingError};
 use serde::{Deserialize, Serialize};
 use crate::AppData;
 
@@ -16,7 +16,7 @@ pub struct ResponderError {
 #[derive(Serialize)]
 pub struct Responder {
     pub status: ResponderStatus,
-    pub payload: Option<Box<dyn erased_serde::Serialize>>,
+    pub payload: Option<Box<dyn erased_serde::Serialize + Send>>,
     pub error: Option<ResponderError>
 }
 impl Default for Responder {
@@ -63,7 +63,7 @@ impl actix_web::Responder for Responder {
 }
 
 impl<T> From<anyhow::Result<T>> for Responder 
-    where T: erased_serde::Serialize + 'static
+    where T: erased_serde::Serialize + Send + 'static
 {
     fn from(value: anyhow::Result<T>) -> Self {
         match value {
@@ -78,5 +78,21 @@ impl<T> From<anyhow::Result<T>> for Responder
                 ..Default::default()
             }
         }
+    }
+}
+impl From<Result<Responder, BlockingError>> for Responder {
+    fn from(value: Result<Responder, BlockingError>) -> Self {
+        match value {
+            Ok(responder) => responder,
+            Err(err) => crate::negotiated::Responder { 
+                status: crate::negotiated::ResponderStatus::Error,
+                error: Some(crate::negotiated::ResponderError {
+                    id: "".to_string(),
+                    message: err.to_string()
+                }
+            ),
+            ..Default::default()
+        }
+    }
     }
 }
