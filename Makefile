@@ -7,4 +7,4 @@ release:
 	cargo build --release
 
 watch:
-	RUST_BACKTRACE=1 cargo watch -x 'run -- --config-file=skytree.ini'
+	RUST_BACKTRACE=1 cargo watch --watch src --watch templates -x 'run -- --config-file=skytree.ini'

@@ -1,6 +1,6 @@
 use actix_web::{HttpRequest, HttpResponse, http::header::{ContentType, self}, body::BoxBody};
 use serde::{Deserialize, Serialize};
-use crate::{Config, AppData};
+use crate::AppData;
 
 #[derive(Debug,Clone, Serialize, Deserialize)]
 pub enum ResponderStatus {
@@ -60,4 +60,23 @@ impl actix_web::Responder for Responder {
         }
     }
 
+}
+
+impl<T> From<anyhow::Result<T>> for Responder 
+    where T: erased_serde::Serialize + 'static
+{
+    fn from(value: anyhow::Result<T>) -> Self {
+        match value {
+            Ok(result) => crate::negotiated::Responder { payload: Some(Box::new(result)), ..Default::default() },
+            Err(err) => crate::negotiated::Responder { 
+                status: crate::negotiated::ResponderStatus::Error,
+                error: Some(crate::negotiated::ResponderError {
+                        id: "".to_string(),
+                        message: err.to_string()
+                    }
+                ),
+                ..Default::default()
+            }
+        }
+    }
 }

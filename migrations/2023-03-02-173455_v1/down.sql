@@ -1,0 +1,12 @@
+PRAGMA foreign_keys=OFF;
+DROP TABLE host_group;
+DROP TABLE host;
+DROP TABLE variable;
+DROP TABLE service;
+DROP TABLE host_variable;
+DROP TABLE service_variable;
+DROP TABLE service_instance;
+DROP TABLE service_instance_variable;
+DROP TABLE host_group_variable;
+DROP TABLE host_group_membership;
+DROP TABLE db_version;

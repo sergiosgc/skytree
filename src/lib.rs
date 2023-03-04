@@ -1,5 +1,5 @@
 use handlebars::Handlebars;
-
+pub mod schema;
 pub mod skytree;
 pub mod negotiated;
 #[derive(Debug, Default, Clone)]

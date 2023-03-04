@@ -1,6 +1,6 @@
 use actix_web::{web, App, HttpServer};
 use handlebars::Handlebars;
-use skytree::{skytree::{host_group::HostGroup, rest::RestCollection}, AppData, Config};
+use skytree::{skytree::{host_group::{HostGroup, self, NewHostGroup}, rest::{RestCollection, Rest}}, AppData, Config};
 use clap::{Parser, command};
 
 #[derive(Parser, Debug)]
@@ -25,11 +25,11 @@ async fn main() -> std::io::Result<()> {
         if let Some(settings) = ini_file_settings.get("skytree") {
             config_template_dir = settings.get("template_dir").unwrap_or(&Some(config_template_dir.clone())).as_deref().unwrap_or(&config_template_dir).to_string();
         }
-        if config_template_dir.len() == 0 {
+        if config_template_dir.is_empty() {
             config_template_dir = "templates".to_string();
         }
-        if config_template_dir.chars().next().unwrap() != '/' {
-            config_template_dir = format!("{}/{}", std::env::current_dir().unwrap().to_str().unwrap().to_string(), config_template_dir);
+        if !config_template_dir.starts_with('/') {
+            config_template_dir = format!("{}/{}", std::env::current_dir().unwrap().to_str().unwrap(), config_template_dir);
         }
         if config_template_dir.chars().rev().next().unwrap() != '/' {
             config_template_dir = format!("{}/", config_template_dir);
@@ -46,8 +46,11 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(app_data.clone())
-            .route("/host_groups", web::get().to(HostGroup::get))
-            .route("/host_groups/{dummy}/some/{variable}", web::get().to(HostGroup::get))
+            .route("/host_groups", web::get().to(<HostGroup as RestCollection<host_group::RestCollectionGetParameters>>::get))
+            .route("/host_group", web::post().to(<HostGroup as Rest<HostGroup, NewHostGroup>>::post))
+            .route("/host_group/{id}", web::get().to(<HostGroup as Rest<HostGroup, NewHostGroup>>::get))
+            .route("/host_group/{id}", web::put().to(<HostGroup as Rest<HostGroup, NewHostGroup>>::put))
+            .route("/host_group/{id}", web::delete().to(<HostGroup as Rest<HostGroup, NewHostGroup>>::delete))
     })
     .bind(("127.0.0.1", 3000))?
     .run()

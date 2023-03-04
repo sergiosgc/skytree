@@ -1,13 +1,5 @@
 PRAGMA foreign_keys=OFF;
-BEGIN TRANSACTION;
-CREATE TABLE __diesel_schema_migrations (
-       version VARCHAR(50) PRIMARY KEY NOT NULL,
-       run_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-INSERT INTO __diesel_schema_migrations VALUES('20230302173455','2023-03-02 18:35:16');
 CREATE TABLE host_group(id INTEGER PRIMARY KEY NOT NULL, parent INTEGER REFERENCES host_groups(id), name TEXT);
-INSERT INTO host_group VALUES(1,NULL,'all');
-INSERT INTO host_group VALUES(2,1,'Dell Servers');
 CREATE TABLE host(id INTEGER PRIMARY KEY NOT NULL, name TEXT);
 CREATE TABLE variable(id INTEGER PRIMARY KEY NOT NULL, name TEXT);
 CREATE TABLE service(id INTEGER PRIMARY KEY NOT NULL, name TEXT, parent references service(id));
@@ -19,4 +11,3 @@ CREATE TABLE host_group_variable(variable INTEGER NOT NULL REFERENCES variable(i
 CREATE TABLE host_group_membership(host integer references host(id), "group" integer references host_group(id), primary key (host, "group"));
 CREATE TABLE db_version(key text primary key NOT NULL check (key = 'single-row'), version integer);
 INSERT INTO db_version VALUES('single-row',1);
-COMMIT;
