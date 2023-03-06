@@ -1,7 +1,7 @@
 use std::env;
 
 use async_trait::async_trait;
-use crate::{negotiated::Responder, rest::{RestCollection, Rest}};
+use crate::{negotiated::Responder, rest::{RestCollection, Rest, Crud, SimpleRest}};
 use serde::{Deserialize, Serialize};
 use diesel::{self, *};
 use crate::schema;
@@ -32,6 +32,7 @@ impl RestCollection<RestCollectionGetParameters> for HostGroup {
         }).await.into()
     }
 }
+impl SimpleRest<HostGroup, NewHostGroup> for HostGroup {}
 #[async_trait]
 impl Rest<HostGroup, NewHostGroup> for HostGroup {
     async fn post(actix_web::web::Json(host_group): actix_web::web::Json<NewHostGroup>) -> Responder {
@@ -57,37 +58,37 @@ impl Rest<HostGroup, NewHostGroup> for HostGroup {
         }).await.into()
     }
 }
-impl HostGroup {
+impl Crud<HostGroup, NewHostGroup> for HostGroup {
     fn db() -> SqliteConnection {
         SqliteConnection::establish(&env::var("DATABASE_URL").expect("DATABASE_URL must be set")).unwrap()
     }
-    pub fn db_insert(to_insert: &NewHostGroup) -> anyhow::Result<HostGroup> {
+    fn db_insert(to_insert: &NewHostGroup) -> anyhow::Result<HostGroup> {
         let mut conn = HostGroup::db();
         Ok(diesel::insert_into(schema::host_group::table)
             .values(to_insert)
             .get_result::<HostGroup>(&mut conn)?)
     }
-    pub fn db_update(to_update: &HostGroup) -> anyhow::Result<HostGroup> {
+    fn db_update(to_update: &HostGroup) -> anyhow::Result<HostGroup> {
         let mut conn = HostGroup::db();
         Ok(diesel::update(schema::host_group::table)
             .filter(crate::schema::host_group::dsl::id.eq(to_update.id))
             .set(to_update)
             .get_result::<HostGroup>(&mut conn)?)
     }
-    pub fn db_fetch_all(name_filter: String, limit: Option<(i64, i64)>) -> anyhow::Result<Vec<HostGroup>> {
+    fn db_fetch_all(name_filter: String, limit: Option<(i64, i64)>) -> anyhow::Result<Vec<HostGroup>> {
         let mut conn = HostGroup::db();
         let mut query = schema::host_group::dsl::host_group.into_boxed();
         if !name_filter.is_empty() { query = query.filter(crate::schema::host_group::dsl::name.like(name_filter)); }
         if let Some(limit_value) = limit { query = query.limit(limit_value.0).offset(limit_value.1); }
         Ok(query.load::<HostGroup>(&mut conn)?)
     }
-    pub fn db_fetch(id: i32) -> anyhow::Result<HostGroup> {
+    fn db_fetch(id: i32) -> anyhow::Result<HostGroup> {
         let mut conn = HostGroup::db();
         Ok(schema::host_group::dsl::host_group
             .filter(crate::schema::host_group::dsl::id.eq(id))
             .first(&mut conn)?)
     }
-    pub fn db_delete(id: i32) -> anyhow::Result<HostGroup> {
+    fn db_delete(id: i32) -> anyhow::Result<HostGroup> {
         let mut conn = HostGroup::db();
         let result = Self::db_fetch(id);
         diesel::delete(schema::host_group::table)
