@@ -1,0 +1,13 @@
+[package]
+name = "negotiated"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = { version = "1.0.X", features = [ "std", "backtrace" ] }
+actix-web = "4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+erased-serde = "0.3.X"
+handlebars = { version = "4.3.X", default-features = true, features = [ "script_helper", "dir_source", "rust-embed" ]}
+

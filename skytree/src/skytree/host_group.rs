@@ -1,7 +1,8 @@
 use std::env;
 
 use async_trait::async_trait;
-use crate::{negotiated::Responder, rest::{RestCollection, Rest, Crud, SimpleRest}};
+use negotiated::Responder;
+use rest::{RestCollection, Rest, Crud};
 use serde::{Deserialize, Serialize};
 use diesel::{self, *};
 use crate::schema;
@@ -32,7 +33,6 @@ impl RestCollection<RestCollectionGetParameters> for HostGroup {
         }).await.into()
     }
 }
-impl SimpleRest<HostGroup, NewHostGroup> for HostGroup {}
 #[async_trait]
 impl Rest<HostGroup, NewHostGroup> for HostGroup {
     async fn post(actix_web::web::Json(host_group): actix_web::web::Json<NewHostGroup>) -> Responder {

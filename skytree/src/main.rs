@@ -1,7 +1,8 @@
 use actix_web::{web, App, HttpServer};
 use handlebars::Handlebars;
 use clap::{Parser, command};
-use skytree::{Config, AppData, skytree::host_group::{HostGroup, NewHostGroup, self}, rest::{RestCollection, Rest}};
+use rest::{RestCollection, Rest};
+use skytree::{Config, AppData, skytree::host_group::{HostGroup, NewHostGroup, self}};
 
 #[derive(Parser, Debug)]
 #[command(name = "skytree")]
@@ -41,7 +42,7 @@ async fn main() -> std::io::Result<()> {
     let mut handlebars = Handlebars::new();
     handlebars.set_strict_mode(true);
     handlebars.register_templates_directory(".hbs", Config::get_template_dir()).unwrap();
-    let app_data = web::Data::new( AppData { handlebars });
+    let app_data = web::Data::new( Box::new(AppData { handlebars }) as Box<dyn negotiated::AppData>);
 
     HttpServer::new(move || {
         App::new()

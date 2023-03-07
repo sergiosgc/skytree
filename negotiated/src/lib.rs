@@ -1,6 +1,10 @@
+use handlebars::Handlebars;
 use actix_web::{HttpRequest, HttpResponse, http::header::{ContentType, self}, body::BoxBody, error::BlockingError};
 use serde::{Deserialize, Serialize};
-use crate::AppData;
+
+pub trait AppData: Send + Sync {
+    fn handlebars(&self) -> &Handlebars;
+}
 
 #[derive(Debug,Clone, Serialize, Deserialize)]
 pub enum ResponderStatus {
@@ -36,7 +40,7 @@ impl actix_web::Responder for Responder {
                 .content_type(ContentType::json())
                 .json(self)
         } else {
-            let handlebars = &req.app_data::<actix_web::web::Data<AppData>>().unwrap().handlebars;
+            let handlebars = &req.app_data::<actix_web::web::Data<Box<dyn AppData>>>().unwrap().handlebars();
             match handlebars.render(
                 &format!("{}/{}", req.match_pattern().unwrap().split_off(1), req.method().as_str().to_lowercase()).replace("//", "/"),
                 &self) {
@@ -67,10 +71,10 @@ impl<T> From<anyhow::Result<T>> for Responder
 {
     fn from(value: anyhow::Result<T>) -> Self {
         match value {
-            Ok(result) => crate::negotiated::Responder { payload: Some(Box::new(result)), ..Default::default() },
-            Err(err) => crate::negotiated::Responder { 
-                status: crate::negotiated::ResponderStatus::Error,
-                error: Some(crate::negotiated::ResponderError {
+            Ok(result) => Responder { payload: Some(Box::new(result)), ..Default::default() },
+            Err(err) => Responder { 
+                status: ResponderStatus::Error,
+                error: Some(ResponderError {
                         id: "".to_string(),
                         message: err.to_string()
                     }
@@ -84,9 +88,9 @@ impl From<Result<Responder, BlockingError>> for Responder {
     fn from(value: Result<Responder, BlockingError>) -> Self {
         match value {
             Ok(responder) => responder,
-            Err(err) => crate::negotiated::Responder { 
-                status: crate::negotiated::ResponderStatus::Error,
-                error: Some(crate::negotiated::ResponderError {
+            Err(err) => Responder { 
+                status: ResponderStatus::Error,
+                error: Some(ResponderError {
                     id: "".to_string(),
                     message: err.to_string()
                 }

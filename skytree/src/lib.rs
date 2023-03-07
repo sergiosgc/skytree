@@ -1,11 +1,15 @@
 use handlebars::Handlebars;
 pub mod schema;
 pub mod skytree;
-pub mod negotiated;
-pub mod rest;
 #[derive(Debug, Default, Clone)]
 pub struct AppData<'a> {
     pub handlebars: Handlebars<'a>,
+}
+impl negotiated::AppData for AppData<'_> {
+    fn handlebars(&self) -> &Handlebars {
+        &self.handlebars
+    }
+
 }
 pub struct Config {
     pub template_dir: &'static str,

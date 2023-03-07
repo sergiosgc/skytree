@@ -1,7 +1,6 @@
 use async_trait::async_trait;
 use diesel::SqliteConnection;
-
-use crate::negotiated::Responder;
+use negotiated::Responder;
 
 #[async_trait]
 pub trait RestCollection<QueryParameters>: Sized {
