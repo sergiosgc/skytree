@@ -5,11 +5,11 @@ edition = "2021"
 
 [dependencies]
 async-trait = "0.1.60"
-diesel = { version = "2.0.X", features = ["sqlite", "returning_clauses_for_sqlite_3_35" ] }
+diesel = { version = "2.0.X", features = ["sqlite", "returning_clauses_for_sqlite_3_35", "r2d2" ] }
 anyhow = { version = "1.0.X", features = [ "std", "backtrace" ] }
 actix-web = "4"
+serde = { version = "1", features = ["derive"] }
 
 [dependencies.negotiated]
 version = "0.X"
 path = "../negotiated"
-

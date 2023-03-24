@@ -1,2 +1,7 @@
 [workspace]
-members = [ "skytree" ]
+members = [ 
+    "skytree",
+    "negotiated",
+    "rest",
+    "rest-derive"
+]

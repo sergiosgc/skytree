@@ -1,8 +1,9 @@
 use actix_web::{web, App, HttpServer};
+use diesel::SqliteConnection;
 use handlebars::Handlebars;
 use clap::{Parser, command};
 use rest::{RestCollection, Rest};
-use skytree::{Config, AppData, skytree::host_group::{HostGroup, NewHostGroup, self}};
+use skytree::{Config, AppData, skytree::host_group::{HostGroup, NewHostGroup}};
 
 #[derive(Parser, Debug)]
 #[command(name = "skytree")]
@@ -42,16 +43,16 @@ async fn main() -> std::io::Result<()> {
     let mut handlebars = Handlebars::new();
     handlebars.set_strict_mode(true);
     handlebars.register_templates_directory(".hbs", Config::get_template_dir()).unwrap();
-    let app_data = web::Data::new( Box::new(AppData { handlebars }) as Box<dyn negotiated::AppData>);
+    let app_data = web::Data::new( AppData { handlebars } );
 
     HttpServer::new(move || {
         App::new()
             .app_data(app_data.clone())
-            .route("/host_groups", web::get().to(<HostGroup as RestCollection<host_group::RestCollectionGetParameters>>::get))
-            .route("/host_group", web::post().to(<HostGroup as Rest<HostGroup, NewHostGroup>>::post))
-            .route("/host_group/{id}", web::get().to(<HostGroup as Rest<HostGroup, NewHostGroup>>::get))
-            .route("/host_group/{id}", web::put().to(<HostGroup as Rest<HostGroup, NewHostGroup>>::put))
-            .route("/host_group/{id}", web::delete().to(<HostGroup as Rest<HostGroup, NewHostGroup>>::delete))
+            .route("/host_groups", web::get().to(<HostGroup as RestCollection<rest::RestCollectionGetParameters, AppData, SqliteConnection>>::get))
+            .route("/host_group", web::post().to(<HostGroup as Rest<HostGroup, NewHostGroup, AppData, SqliteConnection>>::post))
+            .route("/host_group/{id}", web::get().to(<HostGroup as Rest<HostGroup, NewHostGroup, AppData, SqliteConnection>>::get))
+            .route("/host_group/{id}", web::put().to(<HostGroup as Rest<HostGroup, NewHostGroup, AppData, SqliteConnection>>::put))
+            .route("/host_group/{id}", web::delete().to(<HostGroup as Rest<HostGroup, NewHostGroup, AppData, SqliteConnection>>::delete))
     })
     .bind(("127.0.0.1", 3000))?
     .run()

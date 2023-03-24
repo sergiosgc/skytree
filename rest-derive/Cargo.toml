@@ -1,0 +1,16 @@
+[package]
+name = "rest-derive"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+quote = "1.0.X"
+proc-macro2 = "1.0.27"
+proc-macro-error = "1.0.4"
+syn = { version = "1.0", features = ["full", "printing" ] }
+darling = "0.14"
+regex = "1.6.X"
+diesel = { version = "2.0.X" }
+
+[lib]
+proc-macro = true
